@@ -49,8 +49,9 @@ for row in range(sh.nrows):
             if sh.row_values(row)[18] == "Key: Down" and first_down is False:
                 start_time = sh.row_values(row)[19]
                 new_time = int(sh.row_values(row)[19]) - int(start_time)
-                name = keys[new_time][0]
-                order = keys[new_time][1]
+                if new_time in keys:
+                    name = keys[new_time][0]
+                    order = keys[new_time][1]
                 first_down = True
                 # Write the original data
                 for col in range(sh.ncols):
