@@ -17,13 +17,14 @@ EVENT = 18
 # Original time
 TIME = 19
 # GazePosX - bad character
-BADCHAR = 22
+BADCHAR = 24
 # Header
 HEADER = 7
 
 import xlrd
 import xlwt
-
+cell_type = xlwt.XFStyle()
+cell_type.num_format_str = '0'
 print "- Loading KEYS"
 keys = {}
 book_keys = xlrd.open_workbook(KEYS)
@@ -42,16 +43,30 @@ timing = {}
 book_timing = xlrd.open_workbook(TIMING)
 write_book_timing = xlwt.Workbook(encoding='utf-8')
 sh = book_timing.sheet_by_index(0)
-write_sh = write_book_timing.add_sheet('Sheet 1', cell_overwrite_ok = True)
+write_sh = write_book_timing.add_sheet('Sheet 1', cell_overwrite_ok=True)
 first_down = False
 name = ""
 order = 0
 # 1 because in row 0 will be header
 new_row = 1
 
+
+def get_value(value):
+    if not type(value) == float:
+        value = ''.join(value.split())
+        try:
+            value = int(value)
+        except:
+            if value:
+                value = value.replace(value[1], "").replace(",", ".")
+                value = float(value)
+            else:
+                value = ""
+    return value
+
 # For every single row
 for row in range(sh.nrows):
-    # Commentary in TIMING 
+    # Commentary in TIMING
     if not sh.row_values(row)[0].startswith("#"):
         # Header
         if not row == HEADER:
@@ -65,11 +80,11 @@ for row in range(sh.nrows):
                 first_down = True
                 # Write the original data
                 for col in range(sh.ncols):
-                    # Coortinate containt unexpected value in second and third place and the type is string or unicode
-                    if col == BADCHAR and type(sh.cell(row, col).value) != float:
-                        value = sh.cell(row, col).value
-                        value = value.replace(value[1:3], "")
-                        write_sh.write(new_row, col, value)
+                    # Coortinate containt unexpected value in second and third
+                    # place and the type is string or unicode
+                    if col == BADCHAR:
+                        value = get_value(sh.cell(row, col).value)
+                        write_sh.write(new_row, col, value, cell_type)
                         continue
                     write_sh.write(new_row, col, sh.cell(row, col).value)
 
@@ -85,12 +100,11 @@ for row in range(sh.nrows):
                 stop_time = sh.row_values(row)[TIME]
                 end_time = int(sh.row_values(row)[TIME]) - int(start_time)
                 first_down = False
-                
+
                 for col in range(sh.ncols):
-                    if col == BADCHAR and type(sh.cell(row, col).value) != float:
-                        value = sh.cell(row, col).value
-                        value = value.replace(value[1:3], "")
-                        write_sh.write(new_row, col, value)
+                    if col == BADCHAR:
+                        value = get_value(sh.cell(row, col).value)
+                        write_sh.write(new_row, col, value, cell_type)
                         continue
                     write_sh.write(new_row, col, sh.cell(row, col).value)
 
@@ -106,15 +120,14 @@ for row in range(sh.nrows):
             if first_down is True and not sh.row_values(row)[EVENT] == TEXTOFKEY:
 
                 middle_time = int(sh.row_values(row)[TIME]) - int(start_time)
-                
+
                 for col in range(sh.ncols):
-                    if col == BADCHAR and type(sh.cell(row, col).value) != float:
-                        value = sh.cell(row, col).value
-                        value = value.replace(value[1:3], "")
-                        write_sh.write(new_row, col, value)
+                    if col == BADCHAR:
+                        value = get_value(sh.cell(row, col).value)
+                        write_sh.write(new_row, col, value, cell_type)
                         continue
                     write_sh.write(new_row, col, sh.cell(row, col).value)
-                    
+
                 if middle_time in keys:
                     name = keys[middle_time][0]
                     order = keys[middle_time][1]
@@ -122,7 +135,8 @@ for row in range(sh.nrows):
                     write_sh.write(new_row, sh.ncols + 2, order)
 
                 else:
-                    # Try to find a correct time if time in TIMING and KEYS is not equal
+                    # Try to find a correct time if time in TIMING and KEYS is
+                    # not equal
                     for i in xrange(PLUSMINUS):
                         # Bigger original value in TIMING, smaller in KEYS
                         extra_middle_time = middle_time - i
@@ -131,8 +145,9 @@ for row in range(sh.nrows):
                             del keys[extra_middle_time]
                             name = keys[middle_time][0]
                             order = keys[middle_time][1]
-                        
-                        # Bigger time value in KEYS, smaller in TIMING => set next higher value of time
+
+                        # Bigger time value in KEYS, smaller in TIMING => set
+                        # next higher value of time
                         elif (middle_time + i) in keys and (middle_time + i) in keys < middle_time:
                             keys[
                                 (int(sh.row_values(row + 1)[TIME]) - int(start_time))] = keys[middle_time + i]
