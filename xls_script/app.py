@@ -8,6 +8,8 @@ Copyright (c) Tomas Pohanka 2015"""
 TIMING = 'Hypothesis-s4.xls'
 # Input file with times and names of pictures
 KEYS = 'keys.xls'
+# Text in EventParam -> original Key: Down
+TEXTOFKEY = "Key: Down"
 # variable for difference between time in TIMING and KEYS [ms]
 PLUSMINUS = 16
 # EventParam -> for example Key: Down
@@ -54,7 +56,7 @@ for row in range(sh.nrows):
         # Header
         if not row == HEADER:
             # first key down (start)
-            if sh.row_values(row)[EVENT] == "Key: Down" and first_down is False:
+            if sh.row_values(row)[EVENT] == TEXTOFKEY and first_down is False:
                 start_time = sh.row_values(row)[TIME]
                 new_time = int(sh.row_values(row)[TIME]) - int(start_time)
                 if new_time in keys:
@@ -79,7 +81,7 @@ for row in range(sh.nrows):
                 continue
 
             # second key down (end)
-            if sh.row_values(row)[EVENT] == "Key: Down" and first_down is True:
+            if sh.row_values(row)[EVENT] == TEXTOFKEY and first_down is True:
                 stop_time = sh.row_values(row)[TIME]
                 end_time = int(sh.row_values(row)[TIME]) - int(start_time)
                 first_down = False
@@ -101,7 +103,7 @@ for row in range(sh.nrows):
                 continue
 
             # between key down
-            if first_down is True and not sh.row_values(row)[EVENT] == "Key: Down":
+            if first_down is True and not sh.row_values(row)[EVENT] == TEXTOFKEY:
 
                 middle_time = int(sh.row_values(row)[TIME]) - int(start_time)
                 
