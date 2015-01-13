@@ -17,7 +17,7 @@ EVENT = 18
 # Original time
 TIME = 19
 # GazePosX - bad character
-BADCHAR = 24
+BADCHAR = 22,23,24,25
 # Header
 HEADER = 7
 
@@ -55,7 +55,7 @@ def get_value(value):
     if not type(value) == float:
         value = ''.join(value.split())
         try:
-            value = int(value)
+            value = float(value.replace(",", "."))
         except:
             if value:
                 value = value.replace(value[1], "").replace(",", ".")
@@ -82,7 +82,7 @@ for row in range(sh.nrows):
                 for col in range(sh.ncols):
                     # Coortinate containt unexpected value in second and third
                     # place and the type is string or unicode
-                    if col == BADCHAR:
+                    if col in BADCHAR:
                         value = get_value(sh.cell(row, col).value)
                         write_sh.write(new_row, col, value, cell_type)
                         continue
@@ -102,7 +102,7 @@ for row in range(sh.nrows):
                 first_down = False
 
                 for col in range(sh.ncols):
-                    if col == BADCHAR:
+                    if col in BADCHAR:
                         value = get_value(sh.cell(row, col).value)
                         write_sh.write(new_row, col, value, cell_type)
                         continue
@@ -122,7 +122,7 @@ for row in range(sh.nrows):
                 middle_time = int(sh.row_values(row)[TIME]) - int(start_time)
 
                 for col in range(sh.ncols):
-                    if col == BADCHAR:
+                    if col in BADCHAR:
                         value = get_value(sh.cell(row, col).value)
                         write_sh.write(new_row, col, value, cell_type)
                         continue
