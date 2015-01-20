@@ -24,7 +24,7 @@ HEADER = 7
 import xlrd
 import xlwt
 cell_type = xlwt.XFStyle()
-cell_type.num_format_str = '0'
+cell_type.num_format_str = '0.000'
 print "- Loading KEYS"
 keys = {}
 book_keys = xlrd.open_workbook(KEYS)
